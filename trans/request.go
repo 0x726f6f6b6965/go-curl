@@ -19,7 +19,7 @@ func NewCurlRequest(req *http.Request) (CurlRequest, error) {
 }
 
 func (curl *curlRequest) GenerateCommand(inscure bool) error {
-	cmd, filename, cleanup, err := getCommand(curl.request, inscure, &curl.private, &curl.cert, curl.ca)
+	cmd, filename, cleanup, err := getCommand(curl.request, inscure, curl.private, curl.cert, curl.ca)
 	if err != nil {
 		return err
 	}
@@ -85,11 +85,11 @@ func (curl *curlRequest) GetHeader(key string) []string {
 }
 
 func (curl *curlRequest) SetPrivateKey(fileType, path string) {
-	curl.private = privatekey{fileType: fileType, path: path}
+	curl.private = &privatekey{fileType: fileType, path: path}
 }
 
 func (curl *curlRequest) SetCertificate(fileType, path, password string) {
-	curl.cert = certificate{fileType: fileType, path: path, password: password}
+	curl.cert = &certificate{fileType: fileType, path: path, password: password}
 }
 
 func (curl *curlRequest) SetCA(filePath string) {

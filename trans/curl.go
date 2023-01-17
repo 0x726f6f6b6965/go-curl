@@ -11,8 +11,8 @@ type curlRequest struct {
 	cmd      []string
 	filename string
 	cleanup  func() error
-	private  privatekey
-	cert     certificate
+	private  *privatekey
+	cert     *certificate
 	ca       string
 }
 

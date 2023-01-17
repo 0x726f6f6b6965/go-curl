@@ -10,55 +10,56 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetCommandWithBasicAuth(t *testing.T) {
+	asserts := assert.New(t)
 	req, _ := http.NewRequest(http.MethodGet, "https://localhost:8080/home", nil)
 	user, pwd := "admin", "admin123"
 	req.SetBasicAuth(user, pwd)
 	req.BasicAuth()
 	cmd, _, _, err := GetCommand(req, true)
-	if err != nil {
-		t.Error(err)
+	if !asserts.Nil(err, err) {
 		return
 	}
 	for i, val := range cmd {
 		if strings.Contains(val, "Authorization") {
-			if cmd[i-1] != "-H" {
-				t.Error("incorrect header format")
+			if !asserts.Equal(cmd[i-1], "-H", "incorrect header format") {
 				return
 			}
+
 			auths := strings.Split(val, ":")
-			if len(auths) != 2 {
-				t.Error("incorrect header value")
+			if !asserts.Equal(len(auths), 2, "incorrect header value") {
 				return
 			}
-			if !strings.HasPrefix(auths[1], " Basic ") {
-				t.Error("incorrect prefix of the header value")
+
+			if !asserts.True(strings.HasPrefix(auths[1], " Basic "), "incorrect prefix of the header value") {
 				return
 			}
+
 			c, err := base64.StdEncoding.DecodeString(strings.Split(auths[1], " ")[2])
-			if err != nil {
-				t.Error("unable decode the header value")
+			if !asserts.Nil(err, "unable decode the header value") {
 				return
 			}
+
 			cs := string(c)
 			username, password, ok := strings.Cut(cs, ":")
-			if !ok {
-				t.Error("unable parse the auth")
+			if !asserts.True(ok, "unable parse the auth") {
 				return
 			}
-			if username != user || password != pwd {
-				t.Error("incorrect username/password")
+			if !asserts.True(username == user && password == pwd, "incorrect username/password") {
 				return
 			}
 			return
 		}
 	}
-	t.Error("unable get the auth")
+	asserts.Fail("unable get the auth")
 }
 
 func TestGetCommandWithBody(t *testing.T) {
+	asserts := assert.New(t)
 	body := &testBody{
 		User:  "admin",
 		Flag:  true,
@@ -67,36 +68,32 @@ func TestGetCommandWithBody(t *testing.T) {
 	jsondata, _ := json.Marshal(body)
 	req, _ := http.NewRequest(http.MethodPost, "https://localhost:8080/home", bytes.NewReader(jsondata))
 	cmd, filename, cleanup, err := GetCommand(req, true)
-	if err != nil {
-		t.Error(err)
+	if !asserts.Nil(err, err) {
 		return
 	}
 	defer cleanup()
 	f, err := os.ReadFile(filename)
-	if err != nil {
-		t.Error(err)
+	if !asserts.Nil(err, err) {
 		return
 	}
 
-	if string(f) != string(jsondata) {
-		t.Error(err)
+	if !asserts.Equal(string(f), string(jsondata), "body unmatch") {
 		return
 	}
 
 	for i, val := range cmd {
 		if val == "-d" {
-			if cmd[i+1] != fmt.Sprintf("@%s", filename) {
-				t.Error("incorrect filename")
+			if !asserts.Equal(cmd[i+1], fmt.Sprintf("@%s", filename), "incorrect filename") {
 				return
 			}
 			return
 		}
 	}
-	t.Error("unable get the body")
-	return
+	asserts.Fail("unable get the body")
 }
 
 func TestGetResponse(t *testing.T) {
+	asserts := assert.New(t)
 	output := fmt.Sprintf(`%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n%s\r\n\r\n%s`,
 		"HTTP/1.1 200 OK", "Connection: close", "X-Frame-Options: SAMEORIGIN",
 		"Cache-Control: no-cache, no-store, must-revalidate",
@@ -104,32 +101,29 @@ func TestGetResponse(t *testing.T) {
 		"{\"user\":\"response\",\"flag\":false,\"count\":5}",
 	)
 	resp, err := GetResponse([]byte(output))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	if resp.StatusCode != http.StatusOK {
-		t.Error("incorrect status code")
+	if !asserts.Nil(err, err) {
 		return
 	}
 
-	if resp.Status != http.StatusText(http.StatusOK) {
-		t.Error("incorrect status code")
+	if !asserts.Equal(resp.StatusCode, http.StatusOK, "incorrect status code") {
+		return
+	}
+
+	if !asserts.Equal(resp.Status, http.StatusText(http.StatusOK), "incorrect status code") {
 		return
 	}
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Error("read body error")
+	if !asserts.Nil(err, "read body error") {
 		return
 	}
+
 	var result testBody
 	err = json.Unmarshal(body, &result)
-	if err != nil {
-		t.Error("parse body error")
+	if !asserts.Nil(err, "parse body error") {
 		return
 	}
-	if result.Count != 5 || result.Flag != false || result.User != "response" {
-		t.Error("incorrect body")
+
+	if !asserts.True(result.Count == 5 && result.Flag == false && result.User == "response", "incorrect body") {
 		return
 	}
 }
