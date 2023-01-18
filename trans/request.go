@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+
+	"github.com/0x726f6f6b6965/go-curl/filetype"
 )
 
 func NewCurlRequestWithContext(ctx context.Context, req *http.Request) (CurlRequest, error) {
@@ -84,12 +86,12 @@ func (curl *curlRequest) GetHeader(key string) []string {
 	return values
 }
 
-func (curl *curlRequest) SetPrivateKey(fileType, path string) {
-	curl.private = &privatekey{fileType: fileType, path: path}
+func (curl *curlRequest) SetPrivateKey(fileType filetype.FileType, path string) {
+	curl.private = &privatekey{fileType: fileType.String(), path: path}
 }
 
-func (curl *curlRequest) SetCertificate(fileType, path, password string) {
-	curl.cert = &certificate{fileType: fileType, path: path, password: password}
+func (curl *curlRequest) SetCertificate(fileType filetype.FileType, path, password string) {
+	curl.cert = &certificate{fileType: fileType.String(), path: path, password: password}
 }
 
 func (curl *curlRequest) SetCA(filePath string) {

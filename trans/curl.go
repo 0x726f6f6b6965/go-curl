@@ -3,6 +3,8 @@ package trans
 import (
 	"context"
 	"net/http"
+
+	"github.com/0x726f6f6b6965/go-curl/filetype"
 )
 
 type curlRequest struct {
@@ -42,10 +44,10 @@ type CurlRequest interface {
 	GetHeader(key string) []string
 
 	// SetPrivateKey - set the private key
-	SetPrivateKey(fileType, path string)
+	SetPrivateKey(fileType filetype.FileType, path string)
 
 	// SetCertificate - set the certificate
-	SetCertificate(fileType, path, password string)
+	SetCertificate(fileType filetype.FileType, path, password string)
 
 	// SetCA - set the ca file
 	SetCA(filePath string)
