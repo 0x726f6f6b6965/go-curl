@@ -6,7 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- TBD
+- Implement the curl request
+  - convert http request to curl requet
+  - convert curl response to http response
+- Added Makefile
 
 ### Changed
 
