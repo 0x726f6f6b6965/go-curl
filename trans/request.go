@@ -13,7 +13,12 @@ func NewCurlRequestWithContext(ctx context.Context, req *http.Request) (CurlRequ
 	if req == nil {
 		return nil, fmt.Errorf("unable create a curl request without http.Request")
 	}
-	return &curlRequest{ctx: ctx, request: req}, nil
+
+	return &curlRequest{ctx: ctx, request: req,
+		cleanup: func() error { return nil },
+		combinedOutput: func(ctx context.Context, name string, args ...string) ([]byte, error) {
+			return exec.CommandContext(ctx, name, args...).CombinedOutput()
+		}}, nil
 }
 
 func NewCurlRequest(req *http.Request) (CurlRequest, error) {
@@ -45,7 +50,7 @@ func (curl *curlRequest) Execute() ([]byte, error) {
 	if len(curl.cmd) < 3 {
 		return nil, fmt.Errorf("unable to run this command, command: %s", curl.cmd)
 	}
-	return exec.CommandContext(curl.ctx, curl.cmd[0], curl.cmd[1:]...).CombinedOutput()
+	return curl.combinedOutput(curl.ctx, curl.cmd[0], curl.cmd[1:]...)
 }
 
 func (curl *curlRequest) Do() (*http.Response, error) {
