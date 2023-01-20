@@ -7,3 +7,41 @@
 ---
 
 a repository for converting requests between curl and http
+
+## Example
+
+```go
+
+httpReq, err := http.NewRequest(http.MethodGET, "https://example.com/", nil)
+
+if err != nil {
+    // Process error what you like
+}
+
+curlReq, err := NewCurlRequestWithContext(context.Background(), httpReq)
+
+if err != nil {
+    // Process error what you like
+}
+
+
+// if inscure is true, the command will add `-k`
+err = curlReq.GenerateCommand(true)
+
+if err != nil {
+    // Process error what you like
+}
+
+// This can get the curl command
+command := curlReq.GetCommands()
+
+// This can run the curl command and get the http response
+
+resp, err := curlReq.Do()
+
+if err != nil {
+    // Process error what you like
+}
+
+
+```

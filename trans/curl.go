@@ -8,14 +8,15 @@ import (
 )
 
 type curlRequest struct {
-	ctx      context.Context
-	request  *http.Request
-	cmd      []string
-	filename string
-	cleanup  func() error
-	private  *privatekey
-	cert     *certificate
-	ca       string
+	ctx            context.Context
+	request        *http.Request
+	cmd            []string
+	filename       string
+	cleanup        func() error
+	private        *privatekey
+	cert           *certificate
+	ca             string
+	combinedOutput func(ctx context.Context, name string, args ...string) ([]byte, error)
 }
 
 type CurlRequest interface {
