@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Added the parameter of combinedOutput to make testing more convenient.
+- TBD
 
 ### Changed
 
@@ -18,11 +18,21 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Added initial function for cleanup to prevent panic from doing execute function without generate command.
+- TBD
 
 ### Security
 
 - TBD
+
+## [0.0.2] - 2022-01-20
+
+### Added
+
+- Added the parameter of combinedOutput to make testing more convenient.
+
+### Fixed
+
+- Added initial function for cleanup to prevent panic from doing execute function without generate command.
 
 ## [0.0.1] - 2022-01-18
 
